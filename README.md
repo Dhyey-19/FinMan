@@ -1,70 +1,291 @@
-# Getting Started with Create React App
+# Financial Management System (FinMan)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A comprehensive financial management application built with React frontend and Express.js backend, featuring user management, loan tracking, installment management, and reporting capabilities.
 
-## Available Scripts
+## Project Structure
 
-In the project directory, you can run:
+```
+my-project/
+├─ backend/ # Express + MongoDB API
+│ ├─ src/
+│ ├─ package.json
+│ ├─ .env.example
+├─ frontend/ # React / Angular app
+│ ├─ src/
+│ ├─ package.json
+│ ├─ .env.example
+├─ db-backup/ # Database dump or seed data
+├─ README.md # Setup instructions
+└─ .gitignore
+```
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **User Management**: Secure user registration and authentication with JWT
+- **Card Management**: Member ID and name management
+- **Loan Management**: Complete loan lifecycle management
+- **Installment Tracking**: Daily installment management and payment tracking
+- **Dashboard**: Real-time financial summaries and analytics
+- **Reports**: Comprehensive reporting with PDF export capabilities
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Prerequisites
 
-### `npm test`
+- Node.js (v14 or higher)
+- MongoDB (v4.4 or higher)
+- npm or yarn
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Installation & Setup
 
-### `npm run build`
+### 1. Backend Setup
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+cd backend
+npm install
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Create a `.env` file in the backend directory:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+cp .env.example .env
+```
 
-### `npm run eject`
+Edit the `.env` file with your configuration:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```env
+MONGODB_URI=mongodb://localhost:27017/mydb
+JWT_SECRET=your_strong_jwt_secret_key_here
+PORT=5000
+NODE_ENV=development
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 2. Frontend Setup
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+cd frontend
+npm install
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Create a `.env` file in the frontend directory:
 
-## Learn More
+```bash
+cp .env.example .env
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Edit the `.env` file:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```env
+REACT_APP_API_URL=http://localhost:5000
+NODE_ENV=development
+```
 
-### Code Splitting
+### 3. Database Setup
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+#### Option A: Using MongoDB Backup (Recommended)
 
-### Analyzing the Bundle Size
+If you have a database backup in the `db-backup/` folder:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+# Restore the database
+mongorestore --db mydb ./db-backup/mydb
+```
 
-### Making a Progressive Web App
+#### Option B: Fresh Database Setup
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+If starting with a fresh database, the application will create the necessary collections automatically when you start using the features.
 
-### Advanced Configuration
+Make sure MongoDB is running:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```bash
+# Start MongoDB service (Windows)
+net start MongoDB
 
-### Deployment
+# Or start MongoDB daemon (Linux/Mac)
+mongod
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Running the Application
 
-### `npm run build` fails to minify
+### 1. Start the Backend Server
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+cd backend
+npm run dev
+```
+
+The backend server will start on `http://localhost:5000`
+
+### 2. Start the Frontend Application
+
+In a new terminal:
+
+```bash
+cd frontend
+npm run dev
+```
+
+The frontend application will start on `http://localhost:3000`
+
+## How to Create Database Backup
+
+To create a backup of your database for submission:
+
+```bash
+mongodump --db mydb --out ./db-backup
+```
+
+This creates the necessary backup files in the `db-backup/mydb/` folder.
+
+## API Endpoints
+
+### Authentication
+- `POST /signup` - User registration
+- `POST /login` - User login
+- `GET /verify` - Token verification
+
+### Users
+- `GET /users` - Get all users
+- `POST /users` - Add new user
+- `PUT /users/:id` - Update user
+- `DELETE /users/:id` - Delete user
+
+### Cards/Members
+- `GET /cards` - Get all members
+- `GET /cards/search?q=query` - Search members
+- `POST /cards` - Add new member
+- `PUT /cards/:id` - Update member
+- `DELETE /cards/:id` - Delete member
+
+### Loans
+- `GET /loans` - Get all loans
+- `POST /loans` - Add new loan
+- `PUT /loans/:id` - Update loan
+- `DELETE /loans/:id` - Delete loan
+
+### Transactions/Installments
+- `GET /transactions` - Get all transactions
+- `GET /transactions?loanno=LN0001` - Get transactions for specific loan
+- `POST /transactions/create` - Create installment schedule
+- `PUT /transactions/:id` - Update transaction
+- `DELETE /transactions/deleteByLoan` - Delete transactions by loan
+
+### Dashboard
+- `GET /dashboard/summary` - Get dashboard summary
+
+## Database Schema
+
+### Users Collection
+```javascript
+{
+  username: String (unique),
+  password: String (hashed),
+  plainPassword: String
+}
+```
+
+### Cards Collection
+```javascript
+{
+  memberid: String (unique),
+  membername: String
+}
+```
+
+### Loans Collection
+```javascript
+{
+  loanno: String (unique),
+  memberid: String,
+  membername: String,
+  loanamount: Number,
+  loandate: Date,
+  edi: Number, // Equated Daily Installment
+  noi: Number, // Number of Installments
+  paidamount: Number,
+  interestincome: Number,
+  status: Boolean
+}
+```
+
+### Transactions Collection
+```javascript
+{
+  loanno: String,
+  installmentdate: Date,
+  amount: Number,
+  paiddate: Date (nullable)
+}
+```
+
+## Default Login Credentials
+
+The application creates a default admin user on first run:
+- Username: `admin`
+- Password: `admin123`
+
+**Note**: Change these credentials immediately after first login for security.
+
+## Troubleshooting
+
+### Common Issues
+
+1. **MongoDB Connection Error**
+   - Ensure MongoDB is running
+   - Check the connection string in `.env`
+   - Verify MongoDB is accessible on the specified port
+
+2. **Port Already in Use**
+   - Change the PORT in backend `.env` file
+   - Update REACT_APP_API_URL in frontend `.env` file accordingly
+
+3. **CORS Issues**
+   - Ensure backend is running on the correct port
+   - Check REACT_APP_API_URL matches backend URL
+
+4. **JWT Token Issues**
+   - Clear browser localStorage
+   - Restart both frontend and backend servers
+
+### Database Backup
+
+To create a backup of your database:
+
+```bash
+mongodump --db mydb --out ./db-backup
+```
+
+To restore from backup:
+
+```bash
+mongorestore --db mydb ./db-backup/mydb
+```
+
+## Development
+
+### Adding New Features
+
+1. Backend API endpoints should be added to `backend/server.js`
+2. Frontend components should be added to `frontend/src/`
+3. Update this README with new API endpoints
+
+### Code Structure
+
+- **Backend**: Express.js with MongoDB/Mongoose
+- **Frontend**: React with functional components and hooks
+- **Authentication**: JWT-based authentication
+- **Styling**: CSS modules and inline styles
+
+## Production Deployment
+
+1. Set `NODE_ENV=production` in both `.env` files
+2. Use a strong JWT secret
+3. Use MongoDB Atlas or a production MongoDB instance
+4. Build the frontend: `npm run build`
+5. Serve the built files with a web server
+
+## License
+
+MIT License
+
+## Support
+
+For issues and questions, please contact the development team.
