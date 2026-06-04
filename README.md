@@ -1,291 +1,227 @@
-# Financial Management System (FinMan)
+# FinMan (Financial Management System)
 
-A comprehensive financial management application built with React frontend and Express.js backend, featuring user management, loan tracking, installment management, and reporting capabilities.
+FinMan is a full-stack financial management system for handling member cards, loans, daily installments, and reporting. The project includes a React single-page app and an Express + MongoDB API.
+
+## Highlights
+
+- Authentication with JWT (signup/login and token verification)
+- Member card management with search and exports
+- Loan lifecycle management (active/closed) with daily installment schedules
+- Installment payments with auto-close on full repayment
+- Dashboard charts (paid vs outstanding, top members)
+- Reports with Excel/PDF export
+
+## Tech Stack
+
+- Frontend: React (react-router, recharts, jspdf, xlsx)
+- Backend: Express, Mongoose, JWT, bcrypt
+- Database: MongoDB
 
 ## Project Structure
 
 ```
-my-project/
-├─ backend/ # Express + MongoDB API
-│ ├─ src/
-│ ├─ package.json
-│ ├─ .env.example
-├─ frontend/ # React / Angular app
-│ ├─ src/
-│ ├─ package.json
-│ ├─ .env.example
-├─ db-backup/ # Database dump or seed data
-├─ README.md # Setup instructions
-└─ .gitignore
+finman/
+├─ backend/
+│  ├─ src/
+│  │  └─ server.js
+│  ├─ package.json
+│  └─ .env.example
+├─ frontend/
+│  ├─ public/
+│  ├─ src/
+│  ├─ package.json
+│  └─ .env.example
+├─ db-backup/
+│  └─ finman/   # MongoDB dump
+└─ README.md
 ```
-
-## Features
-
-- **User Management**: Secure user registration and authentication with JWT
-- **Card Management**: Member ID and name management
-- **Loan Management**: Complete loan lifecycle management
-- **Installment Tracking**: Daily installment management and payment tracking
-- **Dashboard**: Real-time financial summaries and analytics
-- **Reports**: Comprehensive reporting with PDF export capabilities
 
 ## Prerequisites
 
-- Node.js (v14 or higher)
-- MongoDB (v4.4 or higher)
-- npm or yarn
+- Node.js 18+ recommended
+- MongoDB 4.4+
+- npm
 
-## Installation & Setup
+## Setup
 
-### 1. Backend Setup
+### 1) Backend
 
 ```bash
 cd backend
 npm install
 ```
 
-Create a `.env` file in the backend directory:
-
-```bash
-cp .env.example .env
-```
-
-Edit the `.env` file with your configuration:
+Create backend `.env` (recommended values shown below). The current `.env.example` is a placeholder and does not include the backend keys.
 
 ```env
-MONGODB_URI=mongodb://localhost:27017/mydb
-JWT_SECRET=your_strong_jwt_secret_key_here
+MONGODB_URI=mongodb://localhost:27017/finman
+JWT_SECRET=replace_with_a_strong_secret
 PORT=5000
 NODE_ENV=development
 ```
 
-### 2. Frontend Setup
+Start the API server:
+
+```bash
+node src/server.js
+```
+
+Note: `backend/package.json` currently points to `server.js` at the repo root. Either use the command above or update the script to `node src/server.js`.
+
+### 2) Frontend
 
 ```bash
 cd frontend
 npm install
 ```
 
-Create a `.env` file in the frontend directory:
-
-```bash
-cp .env.example .env
-```
-
-Edit the `.env` file:
+Create frontend `.env`:
 
 ```env
 REACT_APP_API_URL=http://localhost:5000
 NODE_ENV=development
 ```
 
-### 3. Database Setup
-
-#### Option A: Using MongoDB Backup (Recommended)
-
-If you have a database backup in the `db-backup/` folder:
+Start the React app:
 
 ```bash
-# Restore the database
-mongorestore --db mydb ./db-backup/mydb
+npm start
 ```
 
-#### Option B: Fresh Database Setup
+The app runs on `http://localhost:3000` and expects the API at `http://localhost:5000`.
 
-If starting with a fresh database, the application will create the necessary collections automatically when you start using the features.
+Important: several components currently use a hard-coded API URL (`http://localhost:5000`). If you change the backend URL, update those constants or refactor to use `REACT_APP_API_URL`.
 
-Make sure MongoDB is running:
+## Database Restore (Optional)
+
+If you want sample data, restore the MongoDB dump:
 
 ```bash
-# Start MongoDB service (Windows)
-net start MongoDB
-
-# Or start MongoDB daemon (Linux/Mac)
-mongod
+mongorestore --db finman ./db-backup/finman
 ```
 
-## Running the Application
-
-### 1. Start the Backend Server
+To create a new dump later:
 
 ```bash
-cd backend
-npm run dev
+mongodump --db finman --out ./db-backup
 ```
 
-The backend server will start on `http://localhost:5000`
+## Key Workflows
 
-### 2. Start the Frontend Application
+- Sign up a user, then log in to receive a JWT token.
+- Create member cards (Member ID, Member Name).
+- Create loans for members; loan numbers are auto-generated (LN0001, LN0002, ...).
+- Generate installment schedules (daily installments) per loan.
+- Credit installments and auto-close loans when all installments are paid.
+- Export users/cards/loans to Excel or PDF.
 
-In a new terminal:
+## API Reference
 
-```bash
-cd frontend
-npm run dev
-```
+Base URL: `http://localhost:5000`
 
-The frontend application will start on `http://localhost:3000`
+### Auth
 
-## How to Create Database Backup
-
-To create a backup of your database for submission:
-
-```bash
-mongodump --db mydb --out ./db-backup
-```
-
-This creates the necessary backup files in the `db-backup/mydb/` folder.
-
-## API Endpoints
-
-### Authentication
-- `POST /signup` - User registration
-- `POST /login` - User login
-- `GET /verify` - Token verification
+- `POST /signup`
+- `POST /login`
+- `GET /verify` (requires `Authorization: Bearer <token>`)
 
 ### Users
-- `GET /users` - Get all users
-- `POST /users` - Add new user
-- `PUT /users/:id` - Update user
-- `DELETE /users/:id` - Delete user
 
-### Cards/Members
-- `GET /cards` - Get all members
-- `GET /cards/search?q=query` - Search members
-- `POST /cards` - Add new member
-- `PUT /cards/:id` - Update member
-- `DELETE /cards/:id` - Delete member
+- `GET /users`
+- `POST /users`
+- `PUT /users/:id`
+- `DELETE /users/:id`
+
+### Cards
+
+- `GET /cards`
+- `GET /cards/search?q=term`
+- `POST /cards`
+- `PUT /cards/:id`
+- `DELETE /cards/:id`
 
 ### Loans
-- `GET /loans` - Get all loans
-- `POST /loans` - Add new loan
-- `PUT /loans/:id` - Update loan
-- `DELETE /loans/:id` - Delete loan
 
-### Transactions/Installments
-- `GET /transactions` - Get all transactions
-- `GET /transactions?loanno=LN0001` - Get transactions for specific loan
-- `POST /transactions/create` - Create installment schedule
-- `PUT /transactions/:id` - Update transaction
-- `DELETE /transactions/deleteByLoan` - Delete transactions by loan
+- `GET /loans` (requires `Authorization: Bearer <token>`)
+- `POST /loans`
+- `PUT /loans/:id`
+- `DELETE /loans/:id`
+
+### Transactions
+
+- `GET /transactions` (supports `?loanno=LN0001`)
+- `POST /transactions/create`
+- `PUT /transactions/:id`
+- `DELETE /transactions/deleteByLoan`
 
 ### Dashboard
-- `GET /dashboard/summary` - Get dashboard summary
 
-## Database Schema
+- `GET /dashboard/summary` (requires `Authorization: Bearer <token>`)
 
-### Users Collection
-```javascript
+### Health
+
+- `GET /health`
+
+## Data Model (MongoDB)
+
+### Users
+
+```js
 {
-  username: String (unique),
-  password: String (hashed),
-  plainPassword: String
+  username: String, // unique
+  password: String, // bcrypt hash
+  plainPassword: String // stored for demo only
 }
 ```
 
-### Cards Collection
-```javascript
+### Cards
+
+```js
 {
-  memberid: String (unique),
+  memberid: String, // unique
   membername: String
 }
 ```
 
-### Loans Collection
-```javascript
+### Loans
+
+```js
 {
-  loanno: String (unique),
+  loanno: String, // unique, auto-generated
   memberid: String,
   membername: String,
   loanamount: Number,
   loandate: Date,
-  edi: Number, // Equated Daily Installment
-  noi: Number, // Number of Installments
+  edi: Number, // equated daily installment
+  noi: Number, // number of installments
   paidamount: Number,
   interestincome: Number,
-  status: Boolean
+  status: Boolean // true=active, false=closed
 }
 ```
 
-### Transactions Collection
-```javascript
+### Transactions
+
+```js
 {
   loanno: String,
   installmentdate: Date,
   amount: Number,
-  paiddate: Date (nullable)
+  paiddate: Date | null
 }
 ```
 
-## Default Login Credentials
+## Security Notes
 
-The application creates a default admin user on first run:
-- Username: `admin`
-- Password: `admin123`
-
-**Note**: Change these credentials immediately after first login for security.
+- The backend stores `plainPassword` for demo visibility in the UI. Remove this field for production use.
+- Ensure `JWT_SECRET` is a strong, private value in any non-local environment.
 
 ## Troubleshooting
 
-### Common Issues
-
-1. **MongoDB Connection Error**
-   - Ensure MongoDB is running
-   - Check the connection string in `.env`
-   - Verify MongoDB is accessible on the specified port
-
-2. **Port Already in Use**
-   - Change the PORT in backend `.env` file
-   - Update REACT_APP_API_URL in frontend `.env` file accordingly
-
-3. **CORS Issues**
-   - Ensure backend is running on the correct port
-   - Check REACT_APP_API_URL matches backend URL
-
-4. **JWT Token Issues**
-   - Clear browser localStorage
-   - Restart both frontend and backend servers
-
-### Database Backup
-
-To create a backup of your database:
-
-```bash
-mongodump --db mydb --out ./db-backup
-```
-
-To restore from backup:
-
-```bash
-mongorestore --db mydb ./db-backup/mydb
-```
-
-## Development
-
-### Adding New Features
-
-1. Backend API endpoints should be added to `backend/server.js`
-2. Frontend components should be added to `frontend/src/`
-3. Update this README with new API endpoints
-
-### Code Structure
-
-- **Backend**: Express.js with MongoDB/Mongoose
-- **Frontend**: React with functional components and hooks
-- **Authentication**: JWT-based authentication
-- **Styling**: CSS modules and inline styles
-
-## Production Deployment
-
-1. Set `NODE_ENV=production` in both `.env` files
-2. Use a strong JWT secret
-3. Use MongoDB Atlas or a production MongoDB instance
-4. Build the frontend: `npm run build`
-5. Serve the built files with a web server
+- MongoDB connection errors: confirm `MONGODB_URI` and ensure the service is running.
+- JWT issues: clear `localStorage` in the browser and log in again.
+- API URL mismatch: update hard-coded `http://localhost:5000` constants in the frontend.
 
 ## License
 
-MIT License
-
-## Support
-
-For issues and questions, please contact the development team.
+MIT
